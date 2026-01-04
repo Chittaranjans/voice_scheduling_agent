@@ -143,14 +143,20 @@ export function VoiceAgent({ onAuthChange }: VoiceAgentProps) {
     }
   }, [])
 
-  // Reset greeting when user disconnects or auth changes
+  // Store previous auth state to detect logout vs initial load
+  const prevAuthRef = useRef<boolean | null>(null)
+
+  // Reset greeting when user explicitly disconnects (not on initial load)
   useEffect(() => {
-    if (authChecked && !isAuthenticated) {
-      // User logged out - reset for next session
-      setMessages([])
-      setGreetingSpoken(false)
-      greetingSpokenRef.current = false
-      setUserProfile(null)
+    if (authChecked) {
+      // Only reset if user was previously authenticated and now is not (explicit logout)
+      if (prevAuthRef.current === true && !isAuthenticated) {
+        setMessages([])
+        setGreetingSpoken(false)
+        greetingSpokenRef.current = false
+        setUserProfile(null)
+      }
+      prevAuthRef.current = isAuthenticated
     }
   }, [authChecked, isAuthenticated])
 
