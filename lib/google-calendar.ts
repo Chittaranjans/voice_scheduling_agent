@@ -60,19 +60,34 @@ export async function createCalendarEvent(
 
     const calendar = google.calendar({ version: "v3", auth: oauth2Client })
 
+    // Get user's calendar timezone
+    const calendarSettings = await calendar.calendars.get({ calendarId: "primary" })
+    const userTimeZone = calendarSettings.data.timeZone || "UTC"
+
     // Build attendees list
     const attendees = event.attendeeEmails?.map(email => ({ email })) || []
+
+    // Format datetime in the user's timezone (without converting to ISO/UTC)
+    const formatDateTime = (date: Date) => {
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      const seconds = String(date.getSeconds()).padStart(2, '0')
+      return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`
+    }
 
     const calendarEvent = {
       summary: event.title,
       description: event.description || `Meeting scheduled with ${event.attendeeName || "Voice Assistant"}`,
       start: {
-        dateTime: event.startTime.toISOString(),
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        dateTime: formatDateTime(event.startTime),
+        timeZone: userTimeZone,
       },
       end: {
-        dateTime: event.endTime.toISOString(),
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        dateTime: formatDateTime(event.endTime),
+        timeZone: userTimeZone,
       },
       attendees: attendees.length > 0 ? attendees : undefined,
       reminders: {
@@ -196,6 +211,21 @@ export async function updateCalendarEvent(
     
     const calendar = google.calendar({ version: "v3", auth: oauth2Client })
     
+    // Get user's calendar timezone
+    const calendarSettings = await calendar.calendars.get({ calendarId: "primary" })
+    const userTimeZone = calendarSettings.data.timeZone || "UTC"
+    
+    // Format datetime in the user's timezone (without converting to ISO/UTC)
+    const formatDateTime = (date: Date) => {
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      const seconds = String(date.getSeconds()).padStart(2, '0')
+      return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`
+    }
+    
     // Get existing event first
     const existing = await calendar.events.get({
       calendarId: "primary",
@@ -210,15 +240,15 @@ export async function updateCalendarEvent(
     
     if (updates.startTime) {
       updateData.start = {
-        dateTime: updates.startTime.toISOString(),
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        dateTime: formatDateTime(updates.startTime),
+        timeZone: userTimeZone,
       }
     }
     
     if (updates.endTime) {
       updateData.end = {
-        dateTime: updates.endTime.toISOString(),
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        dateTime: formatDateTime(updates.endTime),
+        timeZone: userTimeZone,
       }
     }
     
