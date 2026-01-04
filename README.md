@@ -41,8 +41,8 @@ A real-time voice assistant that helps you schedule meetings using natural conve
 
 ```bash
 # Clone the repository
-git clone https://github.com/chittaranjans/voice-agent.git
-cd voice-agent
+git clone https://github.com/Chittaranjans/voice_scheduling_agent.git
+cd voice_scheduling_agent
 
 # Install dependencies
 npm install
