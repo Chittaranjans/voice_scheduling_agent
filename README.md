@@ -23,7 +23,7 @@ A real-time voice assistant that helps you schedule meetings using natural conve
 
 ## Tech Stack
 
-- **Framework**: Next.js 15, React 19, TypeScript
+- **Framework**: Next.js 16, React 19, TypeScript
 - **Styling**: Tailwind CSS
 - **AI**: Google Gemini AI
 - **Calendar**: Google Calendar API
